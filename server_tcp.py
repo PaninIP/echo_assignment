@@ -1,5 +1,6 @@
 import socket
 import time
+import threading
 
 
 #инициализация сокета сервера
@@ -12,25 +13,41 @@ server_socket.bind((HOST, PORT))
 server_socket.listen()
 print(f"Server started on address {HOST}:{PORT}")
 
-#принятие клиента
-connection, address = server_socket.accept()
-print(f"Client connected: {address}")
-
+def handle_client(connection, address):
+    print(f"Client connected: {address}")
 #расшифровка сообщения от клиента
-while True:
-    data = connection.recv(1024)
+    while True:
+        data = connection.recv(1024)
 
-    if not data:
-        break
+        if not data:
+            break
 
-    timestamp = time.time() #время на момент выполнения команды
-    message = data.decode("utf-8").rstrip("\n")
-    print(message)
+        timestamp = time.time() #время на момент выполнения команды
+        message = data.decode("utf-8").rstrip("\n")
+        print(f"{address} {message}")
 
-    #формирование и отправка ответа клиенту
-    response = f"ECHO: {message} [t={timestamp:.6f}]\n"
-    connection.sendall(response.encode("utf-8"))
+        #формирование и отправка ответа клиенту
+        response = f"ECHO: {message} [t={timestamp:.6f}]\n"
+        connection.sendall(response.encode("utf-8"))
 
-connection.close()
-print("Client disconected")
-server_socket.close()
+    connection.close()
+    print("Client disconected")
+
+#принятие клиента
+try:
+    while True:
+        connection, address = server_socket.accept()
+        #print(f"Client connected: {address}")
+        #handle_client(connection, address)
+        
+        thread = threading.Thread(
+            target=handle_client,
+            args=(connection, address)
+        )
+
+        thread.start()
+except KeyboardInterrupt:
+    print("\nServer stopped by user!!!")
+finally:
+    server_socket.close()
+    print("Server socket closed :(")
