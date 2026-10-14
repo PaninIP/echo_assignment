@@ -16,22 +16,25 @@ print(f"Server started on address {HOST}:{PORT}")
 def handle_client(connection, address):
     print(f"Client connected: {address}")
 #расшифровка сообщения от клиента
-    while True:
-        data = connection.recv(1024)
+    try:
+        while True:
+            data = connection.recv(1024)
 
-        if not data:
-            break
+            if not data:
+                break
 
-        timestamp = time.time() #время на момент выполнения команды
-        message = data.decode("utf-8").rstrip("\n")
-        print(f"{address} {message}")
+            timestamp = time.time() #время на момент выполнения команды
+            message = data.decode("utf-8").rstrip("\n")
+            print(f"{address} {message}")
 
-        #формирование и отправка ответа клиенту
-        response = f"ECHO: {message} [t={timestamp:.6f}]\n"
-        connection.sendall(response.encode("utf-8"))
-
-    connection.close()
-    print("Client disconected")
+            #формирование и отправка ответа клиенту
+            response = f"ECHO: {message} [t={timestamp:.6f}]\n"
+            connection.sendall(response.encode("utf-8"))
+    except OSError as error:
+        print(f"Connection error {address}: {error}")
+    finally:
+        connection.close()
+        print(f"Client disconected {address}")
 
 #принятие клиента
 try:
