@@ -36,7 +36,7 @@ def handle_client(connection, address):
         print(f"Connection error {address}: {error}")
     finally:
         connection.close()
-        print(f"Client disconected {address}")
+        print(f"Client disconnected {address}")
 
 stop_event = threading.Event()
 
@@ -44,6 +44,7 @@ def shutdown_handler(signum, frame):
     print("\nShutdown requested")
     stop_event.set()
 
+# Создание обработчика сигнала, чтобы после нажатия ctrl + C сервер завершал работу
 signal.signal(signal.SIGINT, shutdown_handler)
 
 #принятие клиента
@@ -51,8 +52,6 @@ try:
     while not stop_event.is_set():
         try:
             connection, address = server_socket.accept()
-            #print(f"Client connected: {address}")
-            #handle_client(connection, address)
         except socket.timeout:
             continue
         
@@ -62,8 +61,6 @@ try:
         )
 
         thread.start()
-#except KeyboardInterrupt:
-#    print("\nServer stopped by user!!!")
 finally:
     server_socket.close()
     print("Server socket closed :(")
