@@ -1,6 +1,7 @@
 import socket
 import time
 import threading
+import signal
 
 
 #инициализация сокета сервера
@@ -11,6 +12,7 @@ server_socket.bind((HOST, PORT))
 
 #сервер слушает входящие соединения
 server_socket.listen()
+server_socket.settimeout(1.0)
 print(f"Server started on address {HOST}:{PORT}")
 
 def handle_client(connection, address):
@@ -36,12 +38,23 @@ def handle_client(connection, address):
         connection.close()
         print(f"Client disconected {address}")
 
+stop_event = threading.Event()
+
+def shutdown_handler(signum, frame):
+    print("\nShutdown requested")
+    stop_event.set()
+
+signal.signal(signal.SIGINT, shutdown_handler)
+
 #принятие клиента
 try:
-    while True:
-        connection, address = server_socket.accept()
-        #print(f"Client connected: {address}")
-        #handle_client(connection, address)
+    while not stop_event.is_set():
+        try:
+            connection, address = server_socket.accept()
+            #print(f"Client connected: {address}")
+            #handle_client(connection, address)
+        except socket.timeout:
+            continue
         
         thread = threading.Thread(
             target=handle_client,
@@ -49,8 +62,8 @@ try:
         )
 
         thread.start()
-except KeyboardInterrupt:
-    print("\nServer stopped by user!!!")
+#except KeyboardInterrupt:
+#    print("\nServer stopped by user!!!")
 finally:
     server_socket.close()
     print("Server socket closed :(")
