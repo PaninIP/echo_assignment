@@ -25,7 +25,7 @@ async def worker(number):
     reader, writer = await asyncio.open_connection(HOST, PORT)
 
     try:
-        await barrier.wait()
+        await asyncio.wait_for(await barrier.wait(), timeout=30)
 
         message = f"Hello {number}\n"
 

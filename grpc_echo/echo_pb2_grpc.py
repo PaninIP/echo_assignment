@@ -3,6 +3,7 @@
 import grpc
 import warnings
 
+import echo_pb2 as echo__pb2
 
 GRPC_GENERATED_VERSION = '1.84.0'
 GRPC_VERSION = grpc.__version__
@@ -22,3 +23,75 @@ if _version_not_supported:
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
+
+
+class EchoServiceStub:
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.Echo = channel.stream_stream(
+                '/echo.EchoService/Echo',
+                request_serializer=echo__pb2.EchoRequest.SerializeToString,
+                response_deserializer=echo__pb2.EchoResponse.FromString,
+                _registered_method=True)
+
+
+class EchoServiceServicer:
+    """Missing associated documentation comment in .proto file."""
+
+    def Echo(self, request_iterator, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_EchoServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'Echo': grpc.stream_stream_rpc_method_handler(
+                    servicer.Echo,
+                    request_deserializer=echo__pb2.EchoRequest.FromString,
+                    response_serializer=echo__pb2.EchoResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'echo.EchoService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('echo.EchoService', rpc_method_handlers)
+
+
+ # This class is part of an EXPERIMENTAL API.
+class EchoService:
+    """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def Echo(request_iterator,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.stream_stream(
+            request_iterator,
+            target,
+            '/echo.EchoService/Echo',
+            echo__pb2.EchoRequest.SerializeToString,
+            echo__pb2.EchoResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
