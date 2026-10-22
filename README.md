@@ -4,7 +4,7 @@
 
 ## Запуск
 
-Открой **три терминала** в корне проекта и запусти серверы:
+Нужно открыть **три терминала** в корне проекта и запустить сервера:
 
 ```powershell
 uv run python tcp/server_tcp.py
@@ -12,7 +12,7 @@ uv run python async_tcp/server_async.py
 uv run python grpc_echo/server_grpc.py
 ```
 
-В **четвёртом терминале** запусти замеры и построение графиков:
+В **четвёртом терминале** запутстить замеры и построение графиков:
 
 ```powershell
 uv run python benchmark.py
